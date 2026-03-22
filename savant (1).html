@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Savant — Advanced Academic Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#9a7b3a;
+  --gold2:#c4a45a;
+  --gold3:#e8d49a;
+  --gold-bg:rgba(154,123,58,0.07);
+  --gold-bg2:rgba(154,123,58,0.13);
+  --ivory:#fdfaf3;
+  --ivory2:#f5f0e4;
+  --ivory3:#ede5d0;
+  --ink:#1c1610;
+  --ink2:#2e2416;
+  --ink3:#5c4d36;
+  --ink4:#8c7a5e;
+  --ink5:#b8a88a;
+  --rule:#d4c49a;
+  --rule2:#c0ad82;
+  --deep:#0f0d08;
+  --accent:#6b2b0a;
+  --accent2:#8f3d12;
+  --blue:#1a3a5c;
+  --green:#1a4a2a;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --display:'Cinzel',Georgia,serif;
+  --body:'EB Garamond',Georgia,serif;
+}
+
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--ivory);color:var(--ink);font-size:18px;line-height:1.75;-webkit-font-smoothing:antialiased;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239a7b3a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+
+/* ── Ornamental border top ── */
+.royal-header{background:var(--deep);padding:0;position:relative;overflow:hidden;}
+.royal-header::before{content:'';display:block;height:4px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold3),var(--gold2),var(--gold),transparent);}
+.royal-header-inner{padding:3rem 2rem 2.5rem;text-align:center;position:relative;}
+
+/* ── Crown ornament ── */
+.crown-ornament{color:var(--gold2);font-size:11px;letter-spacing:0.4em;font-family:var(--display);margin-bottom:1.2rem;opacity:0.7;}
+.crown-ornament::before,.crown-ornament::after{content:'⸻';}
+
+/* ── Logo ── */
+.site-title{font-family:var(--display);font-size:clamp(64px,10vw,110px);font-weight:400;color:var(--ivory);letter-spacing:0.15em;line-height:1;text-shadow:0 2px 20px rgba(0,0,0,0.5);}
+.site-title span{color:var(--gold2);}
+.title-ornament{display:flex;align-items:center;justify-content:center;gap:1rem;margin:0.8rem 0;}
+.title-ornament::before,.title-ornament::after{content:'';flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold));}
+.title-ornament::after{background:linear-gradient(90deg,var(--gold),transparent);}
+.title-ornament-center{color:var(--gold2);font-size:14px;}
+.site-subtitle{font-family:var(--serif);font-size:15px;color:var(--gold3);letter-spacing:0.25em;text-transform:uppercase;font-weight:300;opacity:0.8;}
+
+/* ── Nav strip ── */
+.nav-strip{background:var(--ink2);border-top:1px solid rgba(154,123,58,0.3);border-bottom:1px solid rgba(154,123,58,0.3);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-left{display:flex;gap:0;}
+.nav-link{font-family:var(--display);font-size:11px;letter-spacing:0.15em;color:var(--ink5);padding:11px 18px;cursor:pointer;transition:color 0.15s;border:none;background:none;text-transform:uppercase;}
+.nav-link:hover{color:var(--gold2);}
+.nav-right{font-family:var(--display);font-size:9px;letter-spacing:0.12em;color:var(--ink5);display:flex;align-items:center;gap:6px;}
+.reading-badge{background:var(--accent);color:var(--ivory3);border-radius:999px;padding:1px 7px;font-size:9px;display:none;}
+.reading-badge.show{display:inline;}
+
+/* ── Main layout ── */
+.page-wrap{max-width:1160px;margin:0 auto;padding:0 2rem 5rem;}
+
+/* ── Search panel ── */
+.search-panel{background:#fff;border:1px solid var(--rule);border-top:none;padding:2rem 2.5rem 1.8rem;position:relative;}
+.search-panel::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-bottom:2rem;}
+.search-row{display:flex;gap:0;border:1px solid var(--rule2);background:var(--ivory);}
+.search-row:focus-within{border-color:var(--gold);outline:2px solid var(--gold-bg2);}
+.search-icon{padding:0 14px 0 16px;color:var(--ink5);display:flex;align-items:center;flex-shrink:0;}
+#query{flex:1;border:none;outline:none;background:transparent;font-family:var(--body);font-size:19px;padding:14px 8px;color:var(--ink);font-style:italic;}
+#query::placeholder{color:var(--ink5);font-style:italic;}
+.search-btn{padding:13px 30px;background:var(--deep);color:var(--gold2);border:none;font-family:var(--display);font-size:10px;letter-spacing:0.2em;cursor:pointer;text-transform:uppercase;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.search-btn:hover{background:var(--accent);color:var(--ivory);}
+
+/* ── Filter grid ── */
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:1.2rem;}
+.filter-group{display:flex;flex-direction:column;gap:4px;}
+.filter-label{font-family:var(--display);font-size:10px;letter-spacing:0.2em;color:var(--ink4);text-transform:uppercase;}
+.f-input,.f-select{font-family:var(--body);font-size:15px;padding:6px 10px;border:1px solid var(--rule);background:var(--ivory);color:var(--ink2);outline:none;width:100%;font-style:italic;}
+.f-input:focus,.f-select:focus{border-color:var(--gold);}
+.f-select option{background:var(--ivory);font-style:normal;}
+.year-range{display:flex;gap:6px;align-items:center;}
+.year-range input{flex:1;}
+.year-sep{font-family:var(--display);font-size:9px;color:var(--ink5);letter-spacing:0.1em;}
+.f-pill{font-family:var(--display);font-size:9px;padding:7px 14px;border:1px solid var(--rule);background:transparent;color:var(--ink4);cursor:pointer;letter-spacing:0.15em;text-transform:uppercase;transition:all 0.15s;width:100%;}
+.f-pill:hover{border-color:var(--gold);color:var(--gold);}
+.f-pill.active{background:var(--deep);color:var(--gold2);border-color:var(--deep);}
+
+/* ── Layout ── */
+.content-layout{display:grid;grid-template-columns:1fr 270px;gap:3rem;margin-top:2.5rem;align-items:start;}
+@media(max-width:860px){.content-layout{grid-template-columns:1fr;}}
+
+/* ── Section ornament ── */
+.section-ornament{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+.section-ornament::before{content:'';height:1px;background:linear-gradient(90deg,var(--rule2),transparent);flex:0 0 30px;}
+.section-ornament h2{font-family:var(--display);font-size:13px;letter-spacing:0.25em;color:var(--ink3);text-transform:uppercase;white-space:nowrap;}
+.section-ornament::after{content:'';height:1px;background:var(--rule);flex:1;}
+.section-count{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--ink5);margin-left:8px;white-space:nowrap;}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:4rem 0;}
+.empty-fleuron{font-size:32px;color:var(--gold3);margin-bottom:1.5rem;}
+.empty-title{font-family:var(--serif);font-size:28px;font-style:italic;color:var(--ink3);margin-bottom:0.5rem;}
+.empty-sub{font-size:14px;color:var(--ink5);}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2rem;}
+.chip{font-family:var(--body);font-size:15px;font-style:italic;padding:7px 16px;border:1px solid var(--rule);background:#fff;color:var(--ink3);cursor:pointer;transition:all 0.15s;}
+.chip:hover{border-color:var(--gold);color:var(--accent);background:var(--gold-bg);}
+
+/* ── Loading ── */
+.loading-state{text-align:center;padding:4rem 0;}
+.loading-fleuron{font-size:24px;color:var(--gold3);animation:spin 3s linear infinite;display:inline-block;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.loading-text{font-family:var(--serif);font-size:18px;font-style:italic;color:var(--ink4);margin-top:1rem;}
+
+/* ── Result cards ── */
+.result-card{border-bottom:1px solid var(--ivory3);padding:1.6rem 0;animation:fadeIn 0.35s both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.result-card:last-of-type{border-bottom:none;}
+.result-index{font-family:var(--display);font-size:8px;letter-spacing:0.2em;color:var(--ink5);text-transform:uppercase;margin-bottom:6px;}
+.result-title{font-family:var(--serif);font-size:23px;font-weight:500;color:var(--accent);cursor:pointer;line-height:1.3;margin-bottom:7px;transition:color 0.15s;}
+.result-title:hover{color:var(--accent2);text-decoration:underline;text-underline-offset:4px;}
+.result-authors{font-family:var(--body);font-size:15px;font-style:italic;color:var(--ink3);margin-bottom:9px;}
+.result-authors a{color:var(--blue);text-decoration:none;cursor:pointer;transition:color 0.15s;}
+.result-authors a:hover{color:var(--accent);text-decoration:underline;}
+.result-abstract{font-size:15px;color:var(--ink2);line-height:1.7;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.result-footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* ── Badges ── */
+.badge{font-family:var(--display);font-size:10px;letter-spacing:0.1em;padding:4px 10px;text-transform:uppercase;}
+.b-oa{background:rgba(26,74,42,0.08);color:var(--green);border:1px solid rgba(26,74,42,0.2);}
+.b-oa a{color:inherit;text-decoration:none;}
+.b-year{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(154,123,58,0.2);}
+.b-cited{background:rgba(26,58,92,0.07);color:var(--blue);border:1px solid rgba(26,58,92,0.18);}
+.b-field{background:rgba(107,43,10,0.07);color:var(--accent);border:1px solid rgba(107,43,10,0.18);}
+.result-actions{margin-left:auto;display:flex;gap:14px;}
+.act-btn{font-family:var(--display);font-size:10px;letter-spacing:0.12em;color:var(--ink5);background:none;border:none;cursor:pointer;text-transform:uppercase;padding:3px 0;transition:color 0.15s;white-space:nowrap;}
+.act-btn:hover{color:var(--accent);}
+.act-btn.saved{color:var(--gold);}
+
+/* ── Error ── */
+.error-box{border-left:3px solid var(--accent);padding:14px 18px;background:rgba(107,43,10,0.06);font-size:14px;color:var(--accent);font-style:italic;}
+
+/* ── Pagination ── */
+.pagination{display:flex;gap:10px;align-items:center;margin-top:2rem;justify-content:center;}
+.page-btn{font-family:var(--display);font-size:9px;letter-spacing:0.15em;padding:8px 20px;border:1px solid var(--rule2);background:var(--ivory);color:var(--ink3);cursor:pointer;text-transform:uppercase;transition:all 0.15s;}
+.page-btn:hover:not(:disabled){background:var(--deep);color:var(--gold2);border-color:var(--deep);}
+.page-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.page-info{font-family:var(--display);font-size:8px;letter-spacing:0.2em;color:var(--ink5);text-transform:uppercase;}
+
+/* ── Sidebar ── */
+.sidebar{}
+.sidebar-card{background:#fff;border:1px solid var(--rule);padding:1.5rem;}
+.sidebar-card+.sidebar-card{margin-top:1.5rem;}
+.sidebar-card::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:1.2rem;}
+.sidebar-head{font-family:var(--display);font-size:10px;letter-spacing:0.2em;color:var(--ink3);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:baseline;}
+.sidebar-head span{font-family:var(--serif);font-size:12px;font-style:italic;color:var(--ink5);letter-spacing:0;font-weight:400;}
+.reading-empty{font-family:var(--body);font-size:15px;font-style:italic;color:var(--ink5);line-height:1.6;}
+.reading-item{border-bottom:1px solid var(--ivory3);padding:0.7rem 0;display:flex;gap:8px;align-items:start;}
+.reading-item:last-child{border-bottom:none;}
+.reading-item-title{font-family:var(--body);font-size:15px;color:var(--ink2);cursor:pointer;flex:1;line-height:1.4;}
+.reading-item-title:hover{color:var(--accent);}
+.reading-remove{font-family:var(--display);font-size:9px;color:var(--ink5);background:none;border:none;cursor:pointer;flex-shrink:0;padding:2px 0;}
+.reading-remove:hover{color:var(--accent);}
+.clear-btn{font-family:var(--display);font-size:8px;letter-spacing:0.15em;color:var(--ink5);background:none;border:none;cursor:pointer;text-transform:uppercase;margin-top:1rem;text-decoration:underline;}
+.clear-btn:hover{color:var(--accent);}
+
+/* ── Sources sidebar ── */
+.source-list{display:flex;flex-direction:column;gap:8px;}
+.source-item{display:flex;align-items:center;gap:10px;font-family:var(--body);font-size:13px;}
+.source-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+.source-link{color:var(--blue);text-decoration:none;font-style:italic;}
+.source-link:hover{color:var(--accent);text-decoration:underline;}
+.source-note{font-size:13px;color:var(--ink5);}
+
+/* ── Panel ── */
+.panel{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:var(--ivory);border-left:1px solid var(--rule);box-shadow:-8px 0 40px rgba(0,0,0,0.15);z-index:200;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;display:flex;flex-direction:column;}
+.panel.open{right:0;}
+.panel-header{background:var(--deep);padding:1.5rem 2rem;flex-shrink:0;}
+.panel-header::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:1.2rem;}
+.panel-close{position:absolute;top:1.2rem;right:1.5rem;background:none;border:none;color:var(--ink5);font-size:18px;cursor:pointer;line-height:1;}
+.panel-close:hover{color:var(--gold2);}
+.panel-title{font-family:var(--serif);font-size:18px;color:var(--ivory);line-height:1.35;padding-right:2rem;font-style:italic;}
+.panel-sub{font-family:var(--display);font-size:8px;letter-spacing:0.2em;color:var(--gold3);margin-top:6px;text-transform:uppercase;}
+.panel-tabs{display:flex;background:var(--ink2);border-bottom:1px solid rgba(154,123,58,0.2);flex-shrink:0;}
+.panel-tab{font-family:var(--display);font-size:10px;letter-spacing:0.15em;padding:11px 18px;border:none;background:none;cursor:pointer;color:var(--ink5);text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s;}
+.panel-tab.active{color:var(--gold2);border-bottom-color:var(--gold2);}
+.panel-body{padding:1.5rem 2rem;flex:1;}
+.panel-paper{border-bottom:1px solid var(--ivory3);padding:1rem 0;}
+.panel-paper:last-child{border-bottom:none;}
+.panel-paper-title{font-family:var(--serif);font-size:15px;color:var(--accent);cursor:pointer;line-height:1.35;margin-bottom:5px;}
+.panel-paper-title:hover{text-decoration:underline;text-underline-offset:3px;}
+.panel-paper-meta{font-family:var(--display);font-size:10px;letter-spacing:0.08em;color:var(--ink5);text-transform:uppercase;}
+.panel-loading{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--ink5);text-align:center;padding:3rem 0;}
+.overlay{position:fixed;inset:0;background:rgba(15,13,8,0.4);z-index:199;display:none;}
+.overlay.open{display:block;}
+
+/* ── Footer ── */
+.site-footer{background:var(--deep);border-top:1px solid rgba(154,123,58,0.25);padding:2rem;text-align:center;}
+.site-footer::before{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-bottom:1.5rem;}
+.footer-text{font-family:var(--display);font-size:9px;letter-spacing:0.2em;color:var(--ink5);text-transform:uppercase;}
+.footer-text a{color:var(--gold3);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<!-- Royal header -->
+<div class="royal-header">
+  <div class="royal-header-inner">
+    <div class="site-title">S<span>A</span>V<span>A</span>NT</div>
+    <div class="title-ornament">
+      <span class="title-ornament-center">✦</span>
+    </div>
+    <div class="site-subtitle">Advanced Academic Research</div>
+  </div>
+</div>
+
+<div class="nav-strip">
+  <div class="nav-left">
+    <button class="nav-link" onclick="scrollToSearch()">Search</button>
+    <button class="nav-link" onclick="scrollToReading()">Reading List</button>
+    <button class="nav-link" onclick="scrollToSources()">Databases</button>
+  </div>
+  <div class="nav-right">
+    Reading list <span class="reading-badge" id="reading-badge">0</span>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <!-- Search panel -->
+  <div class="search-panel" id="search-section">
+    <div class="search-row">
+      <div class="search-icon">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </div>
+      <input type="text" id="query" placeholder="Search papers, authors, topics, questions…" autocomplete="off"/>
+      <button class="search-btn" id="search-btn">Search</button>
+    </div>
+
+    <div class="filter-grid">
+      <div class="filter-group">
+        <div class="filter-label">Year from</div>
+        <input type="number" class="f-input" id="year-from" placeholder="e.g. 2015" min="1500" max="2025"/>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Year to</div>
+        <input type="number" class="f-input" id="year-to" placeholder="e.g. 2024" min="1500" max="2025"/>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Discipline</div>
+        <input type="text" class="f-input" id="field" placeholder="e.g. Neuroscience, Law…"/>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Min. citations</div>
+        <input type="number" class="f-input" id="min-citations" placeholder="e.g. 50" min="0"/>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Sort by</div>
+        <select class="f-select" id="sort-by">
+          <option value="relevance">Relevance</option>
+          <option value="citationCount">Most cited</option>
+          <option value="publicationDate">Most recent</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Publication type</div>
+        <select class="f-select" id="pub-type">
+          <option value="">All types</option>
+          <option value="Review">Review</option>
+          <option value="JournalArticle">Journal article</option>
+          <option value="Conference">Conference paper</option>
+          <option value="CaseReport">Case report</option>
+          <option value="MetaAnalysis">Meta-analysis</option>
+          <option value="Book">Book / chapter</option>
+          <option value="Preprint">Preprint</option>
+          <option value="ClinicalTrial">Clinical trial</option>
+          <option value="Dataset">Dataset</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Language</div>
+        <input type="text" class="f-input" id="language" placeholder="e.g. French, German…"/>
+      </div>
+      <div class="filter-group" style="justify-content:flex-end;">
+        <div class="filter-label">&nbsp;</div>
+        <button class="f-pill" id="oa-btn">Open access only</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <main id="main">
+      <div class="empty-state">
+        <div class="empty-fleuron">✦</div>
+        <div class="empty-title">What shall we discover today?</div>
+        <div class="empty-sub">Search across 200 million academic papers</div>
+        <div class="chips">
+          <span class="chip">neural networks</span>
+          <span class="chip">CRISPR gene editing</span>
+          <span class="chip">climate change</span>
+          <span class="chip">antibiotic resistance</span>
+          <span class="chip">large language models</span>
+          <span class="chip">quantum computing</span>
+          <span class="chip">mRNA vaccines</span>
+          <span class="chip">dark matter</span>
+          <span class="chip">behavioural economics</span>
+          <span class="chip">Renaissance art</span>
+        </div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-card" id="reading-section">
+        <div class="sidebar-head">
+          Reading List
+          <span id="reading-total">0 papers</span>
+        </div>
+        <div id="reading-body">
+          <div class="reading-empty">No papers saved yet. Click "Save" beneath any result to add it here. Your list persists between visits.</div>
+        </div>
+        <button class="clear-btn" id="clear-btn" style="display:none" onclick="clearReading()">Clear all</button>
+      </div>
+
+      <div class="sidebar-card" id="sources-section">
+        <div class="sidebar-head">Databases</div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">General</div>
+        <div class="source-list" style="margin-bottom:1.2rem;">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.semanticscholar.org" target="_blank">Semantic Scholar</a>
+              <div class="source-note">Powers Savant · 200M+ papers</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://scholar.google.com" target="_blank">Google Scholar</a>
+              <div class="source-note">Broadest coverage, all disciplines</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://openalex.org" target="_blank">OpenAlex</a>
+              <div class="source-note">250M+ open catalogue</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://core.ac.uk" target="_blank">CORE</a>
+              <div class="source-note">200M+ open access papers</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">Medicine &amp; Life Sciences</div>
+        <div class="source-list" style="margin-bottom:1.2rem;">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://pubmed.ncbi.nlm.nih.gov" target="_blank">PubMed</a>
+              <div class="source-note">Gold standard for biomedicine</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.ncbi.nlm.nih.gov/pmc/" target="_blank">PubMed Central</a>
+              <div class="source-note">Free full-text biomedical archive</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.biorxiv.org" target="_blank">bioRxiv</a>
+              <div class="source-note">Biology preprints</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.medrxiv.org" target="_blank">medRxiv</a>
+              <div class="source-note">Health sciences preprints</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">Physics, Math &amp; Computing</div>
+        <div class="source-list" style="margin-bottom:1.2rem;">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://arxiv.org" target="_blank">arXiv</a>
+              <div class="source-note">Physics, Math, CS, Econ preprints</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.inspire-hep.net" target="_blank">INSPIRE-HEP</a>
+              <div class="source-note">High-energy physics literature</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://dl.acm.org" target="_blank">ACM Digital Library</a>
+              <div class="source-note">Computing &amp; information science</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://ieeexplore.ieee.org" target="_blank">IEEE Xplore</a>
+              <div class="source-note">Electrical engineering &amp; electronics</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">Social Sciences, Law &amp; Economics</div>
+        <div class="source-list" style="margin-bottom:1.2rem;">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://papers.ssrn.com" target="_blank">SSRN</a>
+              <div class="source-note">Economics, Law, Social Sciences preprints</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.nber.org/papers" target="_blank">NBER</a>
+              <div class="source-note">Economics working papers</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.jstor.org" target="_blank">JSTOR</a>
+              <div class="source-note">Humanities &amp; Social Sciences archive</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://eric.ed.gov" target="_blank">ERIC</a>
+              <div class="source-note">Education research</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.repec.org" target="_blank">RePEc</a>
+              <div class="source-note">Economics working papers &amp; data</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">Humanities &amp; Languages</div>
+        <div class="source-list" style="margin-bottom:1.2rem;">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://lingbuzz.net" target="_blank">LingBuzz</a>
+              <div class="source-note">Linguistics preprints (syntax, semantics, phonology)</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://philpapers.org" target="_blank">PhilPapers</a>
+              <div class="source-note">Philosophy research database</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.mla.org/Publications/MLA-International-Bibliography" target="_blank">MLA Bibliography</a>
+              <div class="source-note">Literature, languages &amp; linguistics</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://psyarxiv.com" target="_blank">PsyArXiv</a>
+              <div class="source-note">Psychology &amp; cognitive science preprints</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://osf.io/preprints" target="_blank">OSF Preprints</a>
+              <div class="source-note">Social &amp; behavioural sciences</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.persee.fr" target="_blank">Persée</a>
+              <div class="source-note">French academic journals archive</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:var(--display);font-size:9px;letter-spacing:0.15em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px;">Earth &amp; Environment</div>
+        <div class="source-list">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.essoar.org" target="_blank">ESSOAr</a>
+              <div class="source-note">Earth &amp; space science preprints</div>
+            </div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>
+              <a class="source-link" href="https://www.agronomy.org" target="_blank">ChemRxiv</a>
+              <div class="source-note">Chemistry preprints (RSC/ACS)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="site-footer">
+  <div class="footer-text">
+    Savant · Powered by <a href="https://www.semanticscholar.org" target="_blank">Semantic Scholar</a> · Advanced Academic Research
+  </div>
+</div>
+
+<!-- Citations / Related panel -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header" style="position:relative;">
+    <button class="panel-close" onclick="closePanel()">✕</button>
+    <div class="panel-title" id="panel-title"></div>
+    <div class="panel-sub" id="panel-sub"></div>
+  </div>
+  <div class="panel-tabs">
+    <button class="panel-tab active" id="tab-citing" onclick="switchTab('citing')">Cited by</button>
+    <button class="panel-tab" id="tab-refs" onclick="switchTab('refs')">References</button>
+    <button class="panel-tab" id="tab-related" onclick="switchTab('related')">Similar papers</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</div>
+
+<script>
+var oaOnly = false;
+var currentQuery = '';
+var currentOffset = 0;
+var currentTotal = 0;
+var pageSize = 10;
+var currentPaperId = '';
+var currentTab = 'citing';
+var readingList = [];
+try { readingList = JSON.parse(localStorage.getItem('savant-reading') || '[]'); } catch(e){}
+
+updateReadingUI();
+
+// Events
+document.getElementById('oa-btn').onclick = function() {
+  oaOnly = !oaOnly;
+  this.classList.toggle('active', oaOnly);
+};
+document.getElementById('search-btn').onclick = function() { search(0); };
+document.getElementById('query').onkeydown = function(e) { if (e.key === 'Enter') search(0); };
+document.querySelectorAll('.chip').forEach(function(chip) {
+  chip.onclick = function() {
+    document.getElementById('query').value = chip.textContent;
+    search(0);
+  };
+});
+
+function scrollToSearch() { document.getElementById('search-section').scrollIntoView({behavior:'smooth'}); }
+function scrollToReading() { document.getElementById('reading-section').scrollIntoView({behavior:'smooth'}); }
+function scrollToSources() { document.getElementById('sources-section').scrollIntoView({behavior:'smooth'}); }
+
+// ── Search ──
+function search(offset) {
+  var q = document.getElementById('query').value.trim();
+  if (!q) return;
+  currentQuery = q;
+  currentOffset = offset;
+
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading-state"><div class="loading-fleuron">✦</div><div class="loading-text">Searching the archives…</div></div>';
+
+  var yearFrom = document.getElementById('year-from').value.trim();
+  var yearTo = document.getElementById('year-to').value.trim();
+  var field = document.getElementById('field').value.trim();
+  var minCit = parseInt(document.getElementById('min-citations').value) || 0;
+  var sortBy = document.getElementById('sort-by').value;
+  var pubType = document.getElementById('pub-type').value;
+
+  var fields = 'paperId,title,authors,abstract,year,citationCount,isOpenAccess,openAccessPdf,externalIds,fieldsOfStudy,publicationTypes';
+  var lang = document.getElementById('language').value.trim();
+  var url = 'https://api.semanticscholar.org/graph/v1/paper/search'
+    + '?query=' + encodeURIComponent(q)
+    + '&limit=' + pageSize
+    + '&offset=' + offset
+    + '&sort=' + sortBy
+    + '&fields=' + fields;
+
+  var yearRange = '';
+  if (yearFrom && yearTo) yearRange = yearFrom + '-' + yearTo;
+  else if (yearFrom) yearRange = yearFrom + '-';
+  else if (yearTo) yearRange = '-' + yearTo;
+  if (yearRange) url += '&year=' + yearRange;
+
+  if (field) url += '&fieldsOfStudy=' + encodeURIComponent(field);
+  if (pubType) url += '&publicationTypes=' + encodeURIComponent(pubType);
+  // Language note: Semantic Scholar doesn't filter by language natively; we label results post-fetch
+
+  fetch(url)
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      var items = data.data || [];
+      currentTotal = data.total || items.length;
+      if (oaOnly) items = items.filter(function(p) { return p.isOpenAccess; });
+      if (minCit > 0) items = items.filter(function(p) { return (p.citationCount || 0) >= minCit; });
+      renderResults(items, currentTotal, offset);
+    })
+    .catch(function(err) {
+      main.innerHTML = '<div class="error-box">Search failed: ' + err.message + '. Please check your connection and try again.</div>';
+    });
+}
+
+function fmt(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'k';
+  return String(n);
+}
+
+function getPdf(p) { return p.openAccessPdf && p.openAccessPdf.url ? p.openAccessPdf.url : ''; }
+function getDoi(p) { return p.externalIds && p.externalIds.DOI ? p.externalIds.DOI : ''; }
+function getPaperUrl(p) {
+  var doi = getDoi(p);
+  return doi ? 'https://doi.org/' + doi : 'https://www.semanticscholar.org/paper/' + p.paperId;
+}
+
+function renderResults(items, total, offset) {
+  var main = document.getElementById('main');
+  main.innerHTML = '';
+
+  var ornament = document.createElement('div');
+  ornament.className = 'section-ornament';
+  ornament.innerHTML = '<h2>Results</h2><span class="section-count">' + fmt(total) + ' papers · "' + currentQuery + '"</span>';
+  ornament.style.cssText += 'justify-content:flex-start;';
+  main.appendChild(ornament);
+
+  if (items.length === 0) {
+    main.innerHTML += '<div class="empty-state" style="padding:2rem 0"><div class="empty-title">No results found</div><div class="empty-sub">Try different keywords or broaden your filters.</div></div>';
+    return;
+  }
+
+  items.forEach(function(p, i) {
+    var card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.animationDelay = (i * 45) + 'ms';
+
+    var idx = document.createElement('div');
+    idx.className = 'result-index';
+    idx.textContent = 'Paper ' + (offset + i + 1);
+    card.appendChild(idx);
+
+    var title = document.createElement('div');
+    title.className = 'result-title';
+    title.textContent = p.title || 'Untitled';
+    title.onclick = function() { window.open(getPaperUrl(p), '_blank'); };
+    card.appendChild(title);
+
+    var authorList = p.authors || [];
+    if (authorList.length > 0) {
+      var authEl = document.createElement('div');
+      authEl.className = 'result-authors';
+      authorList.slice(0, 4).forEach(function(a, ai) {
+        var link = document.createElement('a');
+        link.textContent = a.name;
+        if (a.authorId) link.onclick = function() { window.open('https://www.semanticscholar.org/author/' + a.authorId, '_blank'); };
+        authEl.appendChild(link);
+        if (ai < Math.min(authorList.length, 4) - 1 || authorList.length > 4) authEl.appendChild(document.createTextNode(', '));
+      });
+      if (authorList.length > 4) authEl.appendChild(document.createTextNode('et al.'));
+      card.appendChild(authEl);
+    }
+
+    if (p.abstract) {
+      var abs = document.createElement('div');
+      abs.className = 'result-abstract';
+      abs.textContent = p.abstract;
+      card.appendChild(abs);
+    }
+
+    var footer = document.createElement('div');
+    footer.className = 'result-footer';
+
+    var pdf = getPdf(p);
+    if (pdf) {
+      var ob = document.createElement('span'); ob.className = 'badge b-oa';
+      var ol = document.createElement('a'); ol.href = pdf; ol.target = '_blank'; ol.textContent = 'Free PDF';
+      ob.appendChild(ol); footer.appendChild(ob);
+    } else if (p.isOpenAccess) {
+      var ob2 = document.createElement('span'); ob2.className = 'badge b-oa'; ob2.textContent = 'Open Access';
+      footer.appendChild(ob2);
+    }
+    if (p.year) { var yb = document.createElement('span'); yb.className = 'badge b-year'; yb.textContent = p.year; footer.appendChild(yb); }
+    if (p.citationCount) { var cb = document.createElement('span'); cb.className = 'badge b-cited'; cb.textContent = fmt(p.citationCount) + ' citations'; footer.appendChild(cb); }
+    (p.fieldsOfStudy || []).slice(0,1).forEach(function(f) { var fb = document.createElement('span'); fb.className = 'badge b-field'; fb.textContent = f; footer.appendChild(fb); });
+
+    var actions = document.createElement('div');
+    actions.className = 'result-actions';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'act-btn' + (isSaved(p.paperId) ? ' saved' : '');
+    saveBtn.textContent = isSaved(p.paperId) ? '★ Saved' : '☆ Save';
+    saveBtn.onclick = function() { toggleSave(p, saveBtn); };
+    actions.appendChild(saveBtn);
+
+    var citBtn = document.createElement('button');
+    citBtn.className = 'act-btn';
+    citBtn.textContent = '↗ Citations';
+    citBtn.onclick = function() { openPanel(p, 'citing'); };
+    actions.appendChild(citBtn);
+
+    var relBtn = document.createElement('button');
+    relBtn.className = 'act-btn';
+    relBtn.textContent = '⟳ Similar';
+    relBtn.onclick = function() { openPanel(p, 'related'); };
+    actions.appendChild(relBtn);
+
+    footer.appendChild(actions);
+    card.appendChild(footer);
+    main.appendChild(card);
+  });
+
+  if (total > pageSize) {
+    var pag = document.createElement('div');
+    pag.className = 'pagination';
+    var prev = document.createElement('button'); prev.className = 'page-btn'; prev.textContent = '← Previous'; prev.disabled = offset === 0;
+    prev.onclick = function() { search(offset - pageSize); window.scrollTo(0,0); };
+    var info = document.createElement('span'); info.className = 'page-info';
+    info.textContent = 'Page ' + (Math.floor(offset/pageSize)+1) + ' of ' + Math.ceil(total/pageSize);
+    var next = document.createElement('button'); next.className = 'page-btn'; next.textContent = 'Next →'; next.disabled = (offset + pageSize) >= total;
+    next.onclick = function() { search(offset + pageSize); window.scrollTo(0,0); };
+    pag.appendChild(prev); pag.appendChild(info); pag.appendChild(next);
+    main.appendChild(pag);
+  }
+}
+
+// ── Reading list ──
+function isSaved(id) { return readingList.some(function(p) { return p.paperId === id; }); }
+
+function toggleSave(p, btn) {
+  if (isSaved(p.paperId)) {
+    readingList = readingList.filter(function(r) { return r.paperId !== p.paperId; });
+    btn.textContent = '☆ Save'; btn.classList.remove('saved');
+  } else {
+    readingList.push({ paperId: p.paperId, title: p.title, url: getPaperUrl(p) });
+    btn.textContent = '★ Saved'; btn.classList.add('saved');
+  }
+  try { localStorage.setItem('savant-reading', JSON.stringify(readingList)); } catch(e){}
+  updateReadingUI();
+}
+
+function clearReading() {
+  readingList = [];
+  try { localStorage.setItem('savant-reading', JSON.stringify(readingList)); } catch(e){}
+  updateReadingUI();
+}
+
+function updateReadingUI() {
+  var n = readingList.length;
+  var badge = document.getElementById('reading-badge');
+  var total = document.getElementById('reading-total');
+  var body = document.getElementById('reading-body');
+  var clearBtn = document.getElementById('clear-btn');
+
+  badge.textContent = n; badge.classList.toggle('show', n > 0);
+  total.textContent = n + (n === 1 ? ' paper' : ' papers');
+  clearBtn.style.display = n > 0 ? 'block' : 'none';
+
+  if (n === 0) {
+    body.innerHTML = '<div class="reading-empty">No papers saved yet. Click "Save" beneath any result to add it here. Your list persists between visits.</div>';
+    return;
+  }
+  body.innerHTML = '';
+  readingList.forEach(function(p) {
+    var item = document.createElement('div'); item.className = 'reading-item';
+    var t = document.createElement('div'); t.className = 'reading-item-title'; t.textContent = p.title;
+    t.onclick = function() { window.open(p.url, '_blank'); };
+    var rm = document.createElement('button'); rm.className = 'reading-remove'; rm.textContent = '✕';
+    rm.onclick = function() {
+      readingList = readingList.filter(function(r) { return r.paperId !== p.paperId; });
+      try { localStorage.setItem('savant-reading', JSON.stringify(readingList)); } catch(e){}
+      updateReadingUI();
+    };
+    item.appendChild(t); item.appendChild(rm); body.appendChild(item);
+  });
+}
+
+// ── Panel ──
+function openPanel(p, tab) {
+  currentPaperId = p.paperId;
+  document.getElementById('panel-title').textContent = p.title;
+  document.getElementById('panel-sub').textContent = 'Connections · ' + fmt(p.citationCount || 0) + ' citations';
+  ['citing','refs','related'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+  currentTab = tab;
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  loadPanelTab(tab, p.paperId);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  ['citing','refs','related'].forEach(function(t) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+  loadPanelTab(tab, currentPaperId);
+}
+
+function loadPanelTab(tab, paperId) {
+  var body = document.getElementById('panel-body');
+  body.innerHTML = '<div class="panel-loading">Searching the archives…</div>';
+  var urlMap = {
+    citing:  'https://api.semanticscholar.org/graph/v1/paper/' + paperId + '/citations?fields=paperId,title,authors,year,citationCount,externalIds&limit=25',
+    refs:    'https://api.semanticscholar.org/graph/v1/paper/' + paperId + '/references?fields=paperId,title,authors,year,citationCount,externalIds&limit=25',
+    related: 'https://api.semanticscholar.org/graph/v1/paper/' + paperId + '/recommendations?fields=paperId,title,authors,year,citationCount,externalIds&limit=25'
+  };
+  fetch(urlMap[tab])
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      var papers = tab === 'related' ? (data.recommendedPapers || []) :
+        (data.data || []).map(function(d) { return d.citingPaper || d.citedPaper || d; });
+      body.innerHTML = '';
+      if (papers.length === 0) { body.innerHTML = '<div class="panel-loading">No results found.</div>'; return; }
+      papers.forEach(function(p) {
+        var doi = p.externalIds && p.externalIds.DOI ? p.externalIds.DOI : '';
+        var url = doi ? 'https://doi.org/' + doi : 'https://www.semanticscholar.org/paper/' + (p.paperId || '');
+        var el = document.createElement('div'); el.className = 'panel-paper';
+        var t = document.createElement('div'); t.className = 'panel-paper-title';
+        t.textContent = p.title || 'Untitled'; t.onclick = function() { window.open(url, '_blank'); };
+        var m = document.createElement('div'); m.className = 'panel-paper-meta';
+        var authStr = (p.authors || []).slice(0,2).map(function(a){return a.name;}).join(', ');
+        if ((p.authors||[]).length > 2) authStr += ' et al.';
+        m.textContent = [authStr, p.year, p.citationCount ? fmt(p.citationCount)+' citations' : ''].filter(Boolean).join(' · ');
+        el.appendChild(t); el.appendChild(m); body.appendChild(el);
+      });
+    })
+    .catch(function() { body.innerHTML = '<div class="panel-loading">Failed to load.</div>'; });
+}
+
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>
